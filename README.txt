@@ -1,0 +1,1 @@
+in eclipse,just run the Example.class,then you can see the log on the console view,send one http request with localhost:8080,and you will see "Hello World!" in the page,this is a simple example user of spring boot

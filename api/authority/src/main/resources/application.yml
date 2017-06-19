@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: jwt
+management:
+  context_path: /admin
+security:
+  user:
+    password: password
+  oauth2:
+    resource:
+      filter-order: 3
+logging:
+  level:debug
+    # org.springframework.security: DEBUG
