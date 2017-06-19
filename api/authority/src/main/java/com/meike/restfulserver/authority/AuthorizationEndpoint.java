@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jersey.ResourceConfigCustomizer;
 import org.springframework.core.ErrorCoded;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -41,8 +42,11 @@ public class AuthorizationEndpoint {
 	@Path("/token")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResResult login(LoginWrapper loginWrapper) throws FileNotFoundException {
-		String msg = BeanValidate.validateModel(loginWrapper);
 		RestResResult resResult = new RestResResult<>();
+		String msg = BeanValidate.validateModel(loginWrapper);
+		if (!StringUtils.isEmpty(msg)) {
+			resResult.setHeadContentEx(1, null);
+		}
 		User user = usermapper.selectByPrimaryKey(1);
 		resResult.setHeadContentEx(ErrorCode.PASSWORD_ERR, null);
 		resResult.setBody(JWTGenerator.generator(user));
