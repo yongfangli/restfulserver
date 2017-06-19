@@ -1,5 +1,7 @@
 package com.meike.restfulserver.common;
 
+import com.meike.restfulserver.common.message.ErrorMessage;
+
 @SuppressWarnings("rawtypes")
 public class RestResResult<T> {
 	private T body;
@@ -56,5 +58,10 @@ public class RestResResult<T> {
 	public void setHeadContent(int code, String msg) {
 		header.code = code;
 		header.msg = msg;
+	}
+
+	public void setHeadContentEx(int passwordErr, String[] params) {
+		header.code = passwordErr;
+		header.msg = ErrorMessage.get(passwordErr, params);
 	}
 }
