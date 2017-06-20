@@ -29,7 +29,7 @@ public class JWTGenerator {
 			String sign = EncodeStringGenerator.getJWTToken(payload);
 			return sign;
 		} catch (Exception e) {
-			logger.debug("generator JWT token error");
+			logger.debug("generate JWT token error");
 		}
 		return null;
 	}

@@ -43,5 +43,17 @@
 			<version>1.6</version>
 			<scope>compile</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.octo.captcha/jcaptcha-all -->
+		<dependency>
+			<groupId>com.octo.captcha</groupId>
+			<artifactId>jcaptcha-all</artifactId>
+			<version>1.0-RC4</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework</groupId>
+					<artifactId>spring</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 </project>
