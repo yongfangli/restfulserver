@@ -1,4 +1,4 @@
-package com.meike.restfulserver.authority;
+package com.meike.restfulserver.authority.wrap;
 
 import javax.validation.constraints.NotNull;
 

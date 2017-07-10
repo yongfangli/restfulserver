@@ -11,6 +11,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.ibatis.io.ResolverUtil.IsA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +22,14 @@ import com.meike.restfulserver.authority.jwt.JWTChecker;
 import com.meike.restfulserver.common.JsonUtils;
 import com.meike.restfulserver.common.RestResResult;
 
+/**
+ * token验证的过滤器，负责校验请求头里的token
+ * @author lyf
+ *
+ */
 @Component
 public class TokenValidateFilter implements Filter {
 	private static final Logger logger = LoggerFactory.getLogger(TokenValidateFilter.class);
-	@Autowired
-	private JWTChecker jwtChecker;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -38,7 +42,8 @@ public class TokenValidateFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		logger.info("request url is " + req.getRequestURL().toString());
 		HttpServletResponse res = (HttpServletResponse) response;
-		if (!isLoginUrl(request)) {
+		JWTChecker jwtChecker = new JWTChecker(req);
+		if (!notAuthorizedUrl(request)) {
 			if (!jwtChecker.checkJWTFromHeader(req)) {
 				// 返回错误信息
 				RestResResult resResult = RestResResult.Ok();
@@ -56,17 +61,18 @@ public class TokenValidateFilter implements Filter {
 		chain.doFilter(request, response);
 	}
 
-	@Override
-	public void destroy() {
-	}
-
-	private boolean isLoginUrl(ServletRequest request) {
+	private boolean notAuthorizedUrl(ServletRequest request) {
 		HttpServletRequest req = (HttpServletRequest) request;
 		String url = req.getRequestURL().toString();
 		logger.debug("request url:" + url);
-		if (url.indexOf("token") > 0) {
+		if (url.indexOf("token") > 0 || url.indexOf("captcha") > 0) {
 			return true;
 		}
 		return false;
 	}
+
+	@Override
+	public void destroy() {
+	}
+
 }

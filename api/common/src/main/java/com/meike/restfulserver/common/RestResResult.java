@@ -64,4 +64,9 @@ public class RestResResult<T> {
 		header.code = passwordErr;
 		header.msg = ErrorMessage.get(passwordErr, params);
 	}
+
+	public void setHeadContentEx(int passwordErr) {
+		header.code = passwordErr;
+		header.msg = ErrorMessage.get(passwordErr);
+	}
 }

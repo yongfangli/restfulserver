@@ -3,6 +3,8 @@ package com.meike.restfulserver.authority;
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -23,23 +25,25 @@ import org.springframework.util.StringUtils;
 
 import com.meike.restfulserver.authority.jwt.JWTGenerator;
 import com.meike.restfulserver.authority.validateCode.RestfulCaptchaService;
+import com.meike.restfulserver.authority.wrap.LoginWrapper;
 import com.meike.restfulserver.common.BeanValidate;
 import com.meike.restfulserver.common.ErrorCode;
 import com.meike.restfulserver.common.RestResResult;
-import com.meike.restfulserver.dao.mapper.UserMapper;
 import com.meike.restfulserver.dao.po.User;
+import com.meike.restfulserver.daoservice.impl.UserServiceImpl;
+import com.meike.restfulserver.exception.NotFoundDataFormDataBaseException;
 
 @Component
-@Path("/authority")
+@Path("authority")
 public class AuthorizationEndpoint {
 	private static final Logger logger = LoggerFactory.getLogger(AuthorizationEndpoint.class);
 	@Autowired
-	private UserMapper usermapper;
+	private UserServiceImpl userService;
 	@Autowired
 	private RestfulCaptchaService restfulCaptchaService;
 
 	@POST
-	@Path("/token")
+	@Path("token")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResResult login(LoginWrapper loginWrapper, @Context HttpServletRequest request)
 			throws FileNotFoundException {
@@ -47,29 +51,38 @@ public class AuthorizationEndpoint {
 		String msg = BeanValidate.validateModel(loginWrapper);
 		if (!StringUtils.isEmpty(msg)) {
 			resResult.setHeadContentEx(1, null);
+		} else if (!restfulCaptchaService.isValidateCode(request, loginWrapper.getCode())) {
+			resResult.setHeadContentEx(ErrorCode.CAPTCHA_ERR);
+		} else {
+			try {
+				User user = userService.findByUsername(loginWrapper.getUsername());
+				if (!user.getPassword().equals(loginWrapper.getPassword())) {
+					resResult.setHeadContentEx(ErrorCode.PASSWORD_ERR);
+				}
+				// 生成jwt
+				Map<String, Object> tokenMap = new HashMap<>();
+				tokenMap.put("token", JWTGenerator.generator(user));
+				resResult.setBody(tokenMap);
+			} catch (NotFoundDataFormDataBaseException e) {
+				logger.info(e.getMessage());
+				resResult.setHeadContentEx(ErrorCode.USER_NOT_FOUND);
+			}
 		}
-		logger.info("validate captcha result:" + restfulCaptchaService.isValidateCode(request, loginWrapper.getCode()));
-		User user = usermapper.selectByPrimaryKey(1);
-		resResult.setHeadContentEx(ErrorCode.PASSWORD_ERR, null);
-		resResult.setBody(JWTGenerator.generator(user));
-		// 生成jwt
+		logger.info(loginWrapper.getUsername() + " login success");
 		return resResult;
 	}
 
 	@POST
-	@Path("/test")
+	@Path("test")
 	@Produces(MediaType.APPLICATION_JSON)
 	public RestResResult test(LoginWrapper loginWrapper) throws FileNotFoundException {
 		String msg = BeanValidate.validateModel(loginWrapper);
 		RestResResult<User> resResult = new RestResResult<>();
-		User user = usermapper.selectByPrimaryKey(1);
-		resResult.setBody(user);
-		// 生成jwt
 		return resResult;
 	}
 
 	@GET
-	@Path("/captcha")
+	@Path("captcha")
 	public void getCaptcha(@Context HttpServletResponse response, @Context HttpServletRequest req) {
 		response.setHeader("Cache-Control", "no-store");
 		response.setHeader("Pragma", "no-cache");
@@ -96,4 +109,5 @@ public class AuthorizationEndpoint {
 		}
 
 	}
+	public 
 }

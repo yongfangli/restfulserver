@@ -19,6 +19,15 @@
 		<mybatis-spring.version>1.3.1</mybatis-spring.version>
 		<mybatis.version>3.4.2</mybatis.version>
 		<mybatis.spring.boot>1.3.0</mybatis.spring.boot>
+		<java.version>1.8</java.version>
+		<java.source.version>1.8</java.source.version>
+		<java.target.version>1.8</java.target.version>
+		<maven.autrun.version>1.3</maven.autrun.version>
+		<maven.assembly.version>2.2-beta-5</maven.assembly.version>
+		<maven.dependency.version>2.8</maven.dependency.version>
+		<maven.release.version>2.3.2</maven.release.version>
+		<maven.jar.version>2.5</maven.jar.version>
+		<maven.compiler.version>2.3.2</maven.compiler.version>
 	</properties>
 	<dependencies>
 		<dependency>
